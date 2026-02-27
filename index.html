@@ -3,36 +3,41 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Mở lì xì</title>
+  <title>Chọn 1 phong bao 🧧</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body class="bg">
-  <canvas id="fw" class="fw" aria-hidden="true"></canvas>
+<body>
+  <canvas id="fx"></canvas>
 
   <main class="wrap">
-    <section class="card">
-      <h1 class="title">Bạn nhận được lì xì 😈</h1>
-      <p class="sub">Bấm mở để bật pháo hoa + nhạc + meme.</p>
+    <header class="top">
+      <h1>Chọn 1 phong bao lì xì 🧧</h1>
+      <p>Pick 1. Đừng run 😈</p>
+    </header>
 
-      <button id="openBtn" class="btn">MỞ LÌ XÌ</button>
+    <section class="grid" id="grid">
+      <!-- 6 envelopes -->
+      <button class="env" data-i="1" aria-label="Envelope 1"><span class="stamp">福</span></button>
+      <button class="env" data-i="2" aria-label="Envelope 2"><span class="stamp">福</span></button>
+      <button class="env" data-i="3" aria-label="Envelope 3"><span class="stamp">福</span></button>
+      <button class="env" data-i="4" aria-label="Envelope 4"><span class="stamp">福</span></button>
+      <button class="env" data-i="5" aria-label="Envelope 5"><span class="stamp">福</span></button>
+      <button class="env" data-i="6" aria-label="Envelope 6"><span class="stamp">福</span></button>
+    </section>
 
-      <div id="reveal" class="reveal hidden">
-        <div class="memeBox">
-          <img src="assets/meme.gif" alt="meme" />
-        </div>
-
-        <div class="audioBox">
-          <div class="now">🎵 Nhạc</div>
-          <audio id="audio" controls preload="auto">
-            <source src="assets/song.mp3" type="audio/mpeg" />
-          </audio>
-          <p class="tiny">Nếu không tự phát, bấm Play trong thanh audio.</p>
-        </div>
-
-        <div class="row">
-          <a class="btn ghost" href="qr.html">Xem QR để share</a>
-        </div>
+    <section class="result hidden" id="result">
+      <div class="memePop">
+        <img src="assets/meme.gif" alt="meme" />
       </div>
+
+      <div class="controls">
+        <audio id="audio" controls preload="auto">
+          <source src="assets/song.mp3" type="audio/mpeg" />
+        </audio>
+        <button class="btn" id="again">Chọn lại</button>
+      </div>
+
+      <p class="hint">Nếu nhạc không tự bật: bấm Play (trình duyệt chặn autoplay).</p>
     </section>
   </main>
 

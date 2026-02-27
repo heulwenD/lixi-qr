@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>QR Lì xì</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="wrap">
+    <section class="card">
+      <div class="seal">🧧</div>
+      <h1>Quét QR để nhận “lì xì”</h1>
+      <p class="sub">QR này dẫn tới trang meme + nhạc.</p>
+
+      <div class="qrFrame">
+        <div id="qr"></div>
+        <div class="qrLabel">SCAN ME</div>
+      </div>
+
+      <p class="tiny" id="targetUrl"></p>
+      <div class="actions">
+        <a class="btn ghost" href="index.html">Test mở trang</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- QR generator (nhẹ, chạy CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script>
+    // TODO: sửa thành link GitHub Pages của bạn sau khi bật Pages
+    const TARGET_URL = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, "/");
+
+    document.getElementById("targetUrl").textContent = "Link: " + TARGET_URL;
+
+    new QRCode(document.getElementById("qr"), {
+      text: TARGET_URL,
+      width: 240,
+      height: 240,
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  </script>
+</body>
+</html>

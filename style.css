@@ -2,8 +2,6 @@
   --bg1:#140007;
   --bg2:#4b0016;
   --gold:#f7c95b;
-  --red:#b3001b;
-  --red2:#8d0014;
   --text:#fff;
 }
 
@@ -20,189 +18,164 @@ body{
   overflow:hidden;
 }
 
-#fx{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:0;
-}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:0}
 
-.wrap{
-  position:relative;
-  z-index:1;
-  min-height:100%;
-  display:grid;
-  place-items:center;
-  padding:20px;
-  gap:14px;
-}
-
-.top{
-  text-align:center;
-}
-.top h1{
-  margin:0 0 6px;
-  font-size:26px;
-  letter-spacing:.2px;
-}
-.top p{
-  margin:0;
-  color:rgba(255,255,255,.75);
-}
+.wrap{position:relative;z-index:1;min-height:100%;display:grid;place-items:center;padding:18px;gap:12px}
+.top{text-align:center}
+.top h1{margin:0 0 6px;font-size:26px}
+.top p{margin:0;color:rgba(255,255,255,.75)}
 
 .grid{
-  width:min(760px, 100%);
+  width:min(860px,100%);
   display:grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns:repeat(3,1fr);
   gap:14px;
 }
 
+/* envelope base */
 .env{
-  appearance:none;
   border:none;
   cursor:pointer;
-  border-radius:18px;
-  height:150px;
-  background:
-    linear-gradient(180deg, rgba(247,201,91,.22), rgba(247,201,91,.06)),
-    linear-gradient(180deg, var(--red), var(--red2));
+  height:160px;
+  border-radius:20px;
+  padding:0;
+  background:transparent;
   position:relative;
-  box-shadow: 0 18px 45px rgba(0,0,0,.35);
-  border:1px solid rgba(247,201,91,.28);
-  transform: translateZ(0);
+  transform:translateZ(0);
+}
+.envInner{
+  position:absolute; inset:0;
+  border-radius:20px;
   overflow:hidden;
+  box-shadow:0 18px 45px rgba(0,0,0,.35);
+  border:1px solid rgba(247,201,91,.22);
 }
 
-.env::before{
-  content:"";
-  position:absolute;
-  inset:10px;
-  border-radius:14px;
-  border:1px solid rgba(247,201,91,.28);
+/* pocket */
+.pocket{
+  position:absolute; left:0; right:0; bottom:0; top:38%;
+  background: rgba(0,0,0,.10);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  border-top:1px solid rgba(255,255,255,.08);
 }
 
-.env::after{
-  content:"";
-  position:absolute;
-  left:0; right:0;
-  top:0;
-  height:42%;
-  background: linear-gradient(180deg, rgba(0,0,0,.18), transparent);
-}
-
-/* stamp */
-.stamp{
-  position:absolute;
-  right:12px;
-  bottom:12px;
-  width:40px;
-  height:40px;
-  border-radius:12px;
-  display:grid;
-  place-items:center;
-  font-weight:900;
-  color:#5b000f;
-  background: radial-gradient(circle at 30% 30%, #ffe7a8, var(--gold));
-  box-shadow: 0 10px 22px rgba(0,0,0,.35);
-  border:1px solid rgba(255,255,255,.25);
-}
-
-/* “flap” */
-.env .flap{
-  position:absolute;
-  left:0; right:0;
-  top:0;
-  height:56%;
-  background: linear-gradient(180deg, #a40018, #770012);
-  clip-path: polygon(0 0, 100% 0, 100% 65%, 50% 100%, 0 65%);
+/* flap */
+.flap{
+  position:absolute; left:0; right:0; top:0; height:62%;
+  clip-path: polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%);
   transform-origin: top center;
   transform: rotateX(0deg);
   transition: transform .55s ease;
-  border-bottom:1px solid rgba(247,201,91,.18);
+  filter: brightness(.95);
 }
 
-/* open animation */
-.env.open{
-  animation: shake .35s ease 1;
-}
-.env.open .flap{
-  transform: rotateX(165deg);
-}
-@keyframes shake{
-  0%{transform:rotate(0)}
-  25%{transform:rotate(-2.5deg)}
-  50%{transform:rotate(2.5deg)}
-  75%{transform:rotate(-2deg)}
-  100%{transform:rotate(0)}
+/* seal */
+.seal{
+  position:absolute; right:12px; bottom:12px;
+  width:42px;height:42px;border-radius:14px;
+  display:grid;place-items:center;
+  font-weight:900;
+  background: radial-gradient(circle at 30% 30%, #ffe7a8, var(--gold));
+  color:#5b000f;
+  border:1px solid rgba(255,255,255,.2);
+  box-shadow:0 10px 22px rgba(0,0,0,.35);
 }
 
-.env.disabled{
-  opacity:.35;
-  cursor:not-allowed;
+/* meme inside envelope */
+.memeIn{
+  position:absolute;
+  left:10px; right:10px;
+  bottom:14px;
+  height:0; /* hidden area */
+  overflow:visible;
+  display:grid;
+  place-items:center;
+  pointer-events:none;
 }
-
-/* result area */
-.result{
-  width:min(560px, 100%);
-  text-align:center;
-  padding:12px;
-  border-radius:18px;
-  background: rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.14);
-  backdrop-filter: blur(10px);
-}
-
-.hidden{display:none}
-
-/* meme pops up */
-.memePop{
-  margin:0 auto 10px;
-  width:min(520px, 100%);
-  border-radius:18px;
-  overflow:hidden;
-  border:1px solid rgba(247,201,91,.22);
-  box-shadow: 0 20px 50px rgba(0,0,0,.35);
-  transform: translateY(18px) scale(.98);
+.memeIn img{
+  width:92%;
+  max-height:220px;
+  border-radius:16px;
+  box-shadow:0 18px 45px rgba(0,0,0,.45);
+  transform: translateY(120%) scale(.98);
   opacity:0;
-  animation: pop .55s ease forwards;
-}
-.memePop img{
-  width:100%;
-  display:block;
-  max-height:320px;
-  object-fit:cover;
-}
-@keyframes pop{
-  to { transform: translateY(0) scale(1); opacity:1; }
 }
 
-.controls{
-  display:flex;
-  gap:10px;
-  justify-content:center;
-  align-items:center;
-  flex-wrap:wrap;
+/* 6 variants: màu + họa tiết */
+.env.v1 .envInner{
+  background: linear-gradient(180deg, #b3001b, #640012);
+}
+.env.v1 .flap{ background: linear-gradient(180deg, #a40018, #720012); }
+
+.env.v2 .envInner{
+  background: linear-gradient(180deg, #c21807, #5b0015);
+}
+.env.v2 .flap{ background: linear-gradient(180deg, #b01206, #6a0018); }
+
+.env.v3 .envInner{
+  background:
+    radial-gradient(8px 8px at 20% 30%, rgba(247,201,91,.25), transparent 55%),
+    radial-gradient(10px 10px at 70% 60%, rgba(247,201,91,.18), transparent 60%),
+    linear-gradient(180deg, #a4002a, #4a0013);
+}
+.env.v3 .flap{ background: linear-gradient(180deg, #8f0024, #5c0018); }
+
+.env.v4 .envInner{
+  background:
+    repeating-linear-gradient(45deg, rgba(247,201,91,.12) 0 8px, transparent 8px 16px),
+    linear-gradient(180deg, #b3001b, #52000f);
+}
+.env.v4 .flap{ background: linear-gradient(180deg, #9b0017, #650012); }
+
+.env.v5 .envInner{
+  background:
+    radial-gradient(220px 120px at 20% 20%, rgba(255,255,255,.10), transparent 60%),
+    linear-gradient(180deg, #9a0017, #3e000c);
+}
+.env.v5 .flap{ background: linear-gradient(180deg, #850013, #4a000e); }
+
+.env.v6 .envInner{
+  background:
+    radial-gradient(260px 140px at 80% 15%, rgba(247,201,91,.16), transparent 60%),
+    linear-gradient(180deg, #b00020, #40000b);
+}
+.env.v6 .flap{ background: linear-gradient(180deg, #98001b, #52000f); }
+
+/* selected/open */
+.env.open .flap{ transform: rotateX(165deg); }
+
+.env.open .memeIn img{
+  animation: memePop .65s cubic-bezier(.2,.9,.2,1) forwards;
+  animation-delay: .35s;
 }
 
+@keyframes memePop{
+  to{ transform: translateY(-35%) scale(1); opacity:1; }
+}
+
+/* hide others simultaneously */
+.env.vanish{
+  animation: vanish .28s ease forwards;
+  pointer-events:none;
+}
+@keyframes vanish{
+  to{ opacity:0; transform: scale(.92); filter: blur(2px); }
+}
+
+/* bottom */
+.bottom{display:grid;place-items:center;gap:8px}
 .btn{
-  border:none;
-  border-radius:14px;
-  padding:10px 12px;
+  border:none;border-radius:14px;
+  padding:10px 14px;
   cursor:pointer;
-  font-weight:800;
-  background: linear-gradient(180deg, rgba(247,201,91,.32), rgba(247,201,91,.12));
-  color:var(--text);
-  border:1px solid rgba(247,201,91,.28);
+  font-weight:900;
+  color:#111;
+  background: radial-gradient(circle at 30% 30%, #ffe7a8, var(--gold));
+  box-shadow:0 16px 40px rgba(0,0,0,.35);
 }
-.btn:hover{filter:brightness(1.06)}
+.hint{margin:0;font-size:12px;color:rgba(255,255,255,.7)}
 
-.hint{
-  margin:10px 0 0;
-  font-size:12px;
-  color:rgba(255,255,255,.7);
-}
-
-@media (max-width: 720px){
-  .grid{grid-template-columns: repeat(2, 1fr);}
-  .env{height:140px}
+@media (max-width: 760px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .env{height:150px}
 }

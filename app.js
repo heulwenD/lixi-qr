@@ -161,6 +161,9 @@
     if(rafFx){ cancelAnimationFrame(rafFx); rafFx=null; }
     if(rafMeme){ cancelAnimationFrame(rafMeme); rafMeme=null; }
     ctx.clearRect(0,0,W,H);
+// remove any flying meme containers
+document.querySelectorAll(".memeFly").forEach(el => el.remove());
+    
   }
 
   envs.forEach(chosen=>{
@@ -177,17 +180,34 @@
       startFxAt(chosen);
       await tryPlay();
 
-      setTimeout(()=>{
-        const wrap = chosen.querySelector(".memeIn .memeWrap");
-        const img  = chosen.querySelector(".memeIn img");
-        if(!wrap || !img) return;
+      setTimeout(() => {
+  const img = chosen.querySelector(".memeIn img");
+  if (!img) return;
 
-        startMemeMove(wrap);
-        img.classList.add("memeBlink");
-        setTimeout(()=>{ chosen.style.display="none"; }, 120);
-      }, 900);
-    });
-  });
+  // 1) Tạo container bay độc lập (tách khỏi envelope)
+  const fly = document.createElement("div");
+  fly.className = "memeFly";          // chỉ để debug, không bắt buộc
+  document.body.appendChild(fly);
+
+  // 2) Move IMG từ envelope sang body
+  fly.appendChild(img);
+
+  // 3) Cho img blink
+  img.classList.add("memeBlink");
+
+  // 4) Bắt đầu bay lượn vòng trên fly (wrapper nằm ở body)
+  startMemeMove(fly);
+
+  // 5) Xóa phần memeIn trống (optional)
+  const memeIn = chosen.querySelector(".memeIn");
+  if (memeIn) memeIn.innerHTML = "";
+
+  // 6) Giờ mới ẩn envelope đã chọn (meme vẫn bay vì nó đã tách ra body)
+  setTimeout(() => {
+    chosen.style.display = "none";
+  }, 120);
+
+}, 900);
 
   again?.addEventListener("click", reset);
 

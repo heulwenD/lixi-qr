@@ -174,10 +174,13 @@ body{
   .env{height:150px}
 }
 /* Meme blink + jitter when flying */
-@keyframes memeBlink {
-  0%   { opacity: 1; filter: none; }
-  50%  { opacity: .15; filter: saturate(1.4) contrast(1.2); }
-  100% { opacity: 1; filter: none; }
+@keyframes memeBlinkOnly{
+  0% { opacity: 1; filter: none; }
+  50%{ opacity: .15; filter: saturate(1.4) contrast(1.2); }
+  100%{ opacity: 1; filter: none; }
+}
+.memeBlink{
+  animation: memeBlinkOnly .18s infinite steps(2,end);
 }
 @keyframes memeJitter {
   0%   { transform: translate(0,0) rotate(0deg); }

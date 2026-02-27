@@ -6,39 +6,69 @@
   <title>QR Lì xì</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="bg">
   <main class="wrap">
     <section class="card">
-      <div class="seal">🧧</div>
-      <h1>Quét QR để nhận “lì xì”</h1>
-      <p class="sub">QR này dẫn tới trang meme + nhạc.</p>
+      <h1 class="title">Quét QR để mở lì xì 🎇</h1>
+      <p class="sub">Quét bằng MoMo/Camera đều ra link.</p>
 
-      <div class="qrFrame">
+      <div class="qrShell">
         <div id="qr"></div>
-        <div class="qrLabel">SCAN ME</div>
       </div>
 
-      <p class="tiny" id="targetUrl"></p>
-      <div class="actions">
+      <p class="tiny" id="urlText"></p>
+
+      <div class="row">
         <a class="btn ghost" href="index.html">Test mở trang</a>
       </div>
     </section>
   </main>
 
-  <!-- QR generator (nhẹ, chạy CDN) -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <!-- QR code styling library -->
+  <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.6.0/lib/qr-code-styling.js"></script>
   <script>
-    // TODO: sửa thành link GitHub Pages của bạn sau khi bật Pages
-    const TARGET_URL = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, "/");
+    // ✅ Nếu bạn deploy GitHub Pages dạng https://username.github.io/lixi-momo-qr/
+    // thì TARGET_URL tự suy ra sẽ đúng.
+    const TARGET_URL =
+      window.location.origin +
+      window.location.pathname.replace(/\/[^\/]*$/, "/") +
+      "index.html";
 
-    document.getElementById("targetUrl").textContent = "Link: " + TARGET_URL;
+    document.getElementById("urlText").textContent = "Link: " + TARGET_URL;
 
-    new QRCode(document.getElementById("qr"), {
-      text: TARGET_URL,
-      width: 240,
-      height: 240,
-      correctLevel: QRCode.CorrectLevel.H
+    const qrCode = new QRCodeStyling({
+      width: 280,
+      height: 280,
+      type: "canvas",
+      data: TARGET_URL,
+      image: "assets/logo.png", // logo ở giữa
+      margin: 8,
+      qrOptions: {
+        errorCorrectionLevel: "H" // quan trọng để chèn logo vẫn scan được
+      },
+      dotsOptions: {
+        type: "rounded",
+        color: "#000000"
+      },
+      cornersSquareOptions: {
+        type: "extra-rounded",
+        color: "#000000"
+      },
+      cornersDotOptions: {
+        type: "dot",
+        color: "#000000"
+      },
+      backgroundOptions: {
+        color: "#ffffff"
+      },
+      imageOptions: {
+        crossOrigin: "anonymous",
+        margin: 6,
+        imageSize: 0.22 // logo to vừa
+      }
     });
+
+    qrCode.append(document.getElementById("qr"));
   </script>
 </body>
 </html>

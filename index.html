@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lì xì QR 😼</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="wrap">
+    <section class="card">
+      <div class="seal">🧧</div>
+      <h1>Lì xì online</h1>
+      <p class="sub">Bấm để mở. Nhạc + meme sẽ xuất hiện 😈</p>
+
+      <button id="openBtn" class="btn">MỞ LÌ XÌ</button>
+
+      <div id="reveal" class="reveal hidden" aria-hidden="true">
+        <div class="memeBox">
+          <img src="assets/meme.gif" alt="meme" />
+        </div>
+
+        <div class="audioBox">
+          <div class="now">🎵 Đang phát</div>
+          <audio id="audio" controls preload="auto">
+            <source src="assets/song.mp3" type="audio/mpeg" />
+            Trình duyệt không hỗ trợ audio.
+          </audio>
+          <p class="hint">Nếu không nghe được, bấm nút Play trong thanh audio.</p>
+        </div>
+
+        <div class="actions">
+          <button id="againBtn" class="btn ghost">MỞ LẠI</button>
+          <a class="btn ghost" href="qr.html">Xem QR để share</a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span>Made for fun.</span>
+    </footer>
+  </main>
+
+  <canvas id="fx" class="fx" aria-hidden="true"></canvas>
+  <script src="app.js"></script>
+</body>
+</html>

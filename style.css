@@ -55,7 +55,6 @@ body{
 .pocket{
   position:absolute; left:0; right:0; bottom:0; top:38%;
   background: rgba(0,0,0,.10);
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
   border-top:1px solid rgba(255,255,255,.08);
 }
 
@@ -81,55 +80,50 @@ body{
   box-shadow:0 10px 22px rgba(0,0,0,.35);
 }
 
-/* meme inside envelope */
+/* meme inside envelope, will pop out */
 .memeIn{
   position:absolute;
   left:10px; right:10px;
   bottom:14px;
-  height:0; /* hidden area */
-  overflow:visible;
+  pointer-events:none;
   display:grid;
   place-items:center;
-  pointer-events:none;
 }
 .memeIn img{
   width:92%;
-  max-height:220px;
+  max-height:240px;
   border-radius:16px;
   box-shadow:0 18px 45px rgba(0,0,0,.45);
   transform: translateY(120%) scale(.98);
   opacity:0;
+  will-change: transform, opacity;
 }
 
-/* 6 variants: màu + họa tiết */
-.env.v1 .envInner{
-  background: linear-gradient(180deg, #b3001b, #640012);
-}
+/* 6 variants: khác màu + pattern */
+.env.v1 .envInner{ background: linear-gradient(180deg, #b3001b, #640012); }
 .env.v1 .flap{ background: linear-gradient(180deg, #a40018, #720012); }
 
-.env.v2 .envInner{
-  background: linear-gradient(180deg, #c21807, #5b0015);
-}
+.env.v2 .envInner{ background: linear-gradient(180deg, #c21807, #5b0015); }
 .env.v2 .flap{ background: linear-gradient(180deg, #b01206, #6a0018); }
 
 .env.v3 .envInner{
   background:
-    radial-gradient(8px 8px at 20% 30%, rgba(247,201,91,.25), transparent 55%),
-    radial-gradient(10px 10px at 70% 60%, rgba(247,201,91,.18), transparent 60%),
+    radial-gradient(10px 10px at 18% 30%, rgba(247,201,91,.20), transparent 60%),
+    radial-gradient(12px 12px at 72% 58%, rgba(247,201,91,.14), transparent 60%),
     linear-gradient(180deg, #a4002a, #4a0013);
 }
 .env.v3 .flap{ background: linear-gradient(180deg, #8f0024, #5c0018); }
 
 .env.v4 .envInner{
   background:
-    repeating-linear-gradient(45deg, rgba(247,201,91,.12) 0 8px, transparent 8px 16px),
+    repeating-linear-gradient(45deg, rgba(247,201,91,.10) 0 8px, transparent 8px 16px),
     linear-gradient(180deg, #b3001b, #52000f);
 }
 .env.v4 .flap{ background: linear-gradient(180deg, #9b0017, #650012); }
 
 .env.v5 .envInner{
   background:
-    radial-gradient(220px 120px at 20% 20%, rgba(255,255,255,.10), transparent 60%),
+    radial-gradient(240px 140px at 20% 20%, rgba(255,255,255,.10), transparent 60%),
     linear-gradient(180deg, #9a0017, #3e000c);
 }
 .env.v5 .flap{ background: linear-gradient(180deg, #850013, #4a000e); }
@@ -144,18 +138,18 @@ body{
 /* selected/open */
 .env.open .flap{ transform: rotateX(165deg); }
 
+/* meme pop-out from envelope */
 .env.open .memeIn img{
-  animation: memePop .65s cubic-bezier(.2,.9,.2,1) forwards;
+  animation: memePop .70s cubic-bezier(.2,.9,.2,1) forwards;
   animation-delay: .35s;
 }
-
 @keyframes memePop{
-  to{ transform: translateY(-35%) scale(1); opacity:1; }
+  to{ transform: translateY(-48%) scale(1); opacity:1; }
 }
 
 /* hide others simultaneously */
 .env.vanish{
-  animation: vanish .28s ease forwards;
+  animation: vanish .20s ease forwards;
   pointer-events:none;
 }
 @keyframes vanish{

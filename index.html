@@ -16,62 +16,59 @@
     </header>
 
     <section class="grid" id="grid">
-      <!-- Envelope template x6 -->
       <button class="env v1" aria-label="Envelope 1">
         <div class="envInner">
           <div class="flap"></div>
           <div class="pocket"></div>
           <div class="seal">福</div>
-          <div class="memeIn">
-            <img id="memeImg" src="assets/meme.jpg" alt="meme"/>
-          </div>
+          <div class="memeIn"><img src="assets/meme.jpg" alt="meme"></div>
         </div>
       </button>
 
       <button class="env v2" aria-label="Envelope 2">
         <div class="envInner">
           <div class="flap"></div><div class="pocket"></div><div class="seal">福</div>
-          <div class="memeIn"><img src="assets/meme.jpg" alt="meme"/></div>
+          <div class="memeIn"><img src="assets/meme.jpg" alt="meme"></div>
         </div>
       </button>
 
       <button class="env v3" aria-label="Envelope 3">
         <div class="envInner">
           <div class="flap"></div><div class="pocket"></div><div class="seal">福</div>
-          <div class="memeIn"><img src="assets/meme.jpg" alt="meme"/></div>
+          <div class="memeIn"><img src="assets/meme.jpg" alt="meme"></div>
         </div>
       </button>
 
       <button class="env v4" aria-label="Envelope 4">
         <div class="envInner">
           <div class="flap"></div><div class="pocket"></div><div class="seal">福</div>
-          <div class="memeIn"><img src="assets/meme.jpg" alt="meme"/></div>
+          <div class="memeIn"><img src="assets/meme.jpg" alt="meme"></div>
         </div>
       </button>
 
       <button class="env v5" aria-label="Envelope 5">
         <div class="envInner">
           <div class="flap"></div><div class="pocket"></div><div class="seal">福</div>
-          <div class="memeIn"><img src="assets/meme.jpg" alt="meme"/></div>
+          <div class="memeIn"><img src="assets/meme.jpg" alt="meme"></div>
         </div>
       </button>
 
       <button class="env v6" aria-label="Envelope 6">
         <div class="envInner">
           <div class="flap"></div><div class="pocket"></div><div class="seal">福</div>
-          <div class="memeIn"><img src="assets/meme.jpg" alt="meme"/></div>
+          <div class="memeIn"><img src="assets/meme.jpg" alt="meme"></div>
         </div>
       </button>
     </section>
 
     <div class="bottom">
       <button class="btn" id="again">Chọn lại</button>
-      <p class="hint">Nếu iPhone chặn autoplay: bấm chọn phong bao lần nữa.</p>
+      <p class="hint">Nếu bị chặn autoplay (đặc biệt iPhone): chạm màn hình 1 lần.</p>
     </div>
   </main>
 
-  <!-- Audio ẩn (không hiện player) -->
-  <audio id="audio" preload="auto">
+  <!-- audio ẩn, KHÔNG controls -->
+  <audio id="audio" preload="auto" loop>
     <source src="assets/song.mp3" type="audio/mpeg" />
   </audio>
 

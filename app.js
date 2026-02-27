@@ -119,8 +119,8 @@ async function tryPlay(){
 function startMemeMove(imgEl){
   // move the IMG itself (fixed)
   imgEl.style.position = "fixed";
-  imgEl.style.left = "10px";
-  imgEl.style.top = "10px";
+  imgEl.style.left = "0px";
+  imgEl.style.top = "0px";
   imgEl.style.zIndex = "10";
   imgEl.style.pointerEvents = "none";
 
@@ -130,43 +130,61 @@ function startMemeMove(imgEl){
   imgEl.style.maxHeight = (window.innerHeight * 0.55) + "px";
   imgEl.style.objectFit = "contain";
 
-  const rect = imgEl.getBoundingClientRect();
-  mover = {
-    x: rect.left,
-    y: rect.top,
-    vx: rand(2.0, 4.5) * (Math.random()<0.5?-1:1),
-    vy: rand(2.0, 4.5) * (Math.random()<0.5?-1:1),
-  };
+  // orbit parameters
+  const pad = 8;
+  let t = 0;
+
+  // center point moves slowly (like drifting), meme orbits around it
+  let cx = rand(pad, window.innerWidth - pad);
+  let cy = rand(pad, window.innerHeight - pad);
+
+  let dcx = rand(0.6, 1.6) * (Math.random()<0.5?-1:1);
+  let dcy = rand(0.6, 1.6) * (Math.random()<0.5?-1:1);
+
+  let radius = rand(60, 160);
+  let omega = rand(0.018, 0.045); // angular speed
+  let wobble = rand(0.12, 0.35);  // radius wobble
 
   function step(){
     if(!locked) return;
 
     const w = imgEl.getBoundingClientRect().width;
     const h = imgEl.getBoundingClientRect().height;
-
-    const pad = 6;
     const maxX = window.innerWidth - w - pad;
     const maxY = window.innerHeight - h - pad;
 
-    mover.x += mover.vx;
-    mover.y += mover.vy;
+    // drift center (cx, cy)
+    cx += dcx;
+    cy += dcy;
 
-    // bounce
-    if(mover.x < pad){ mover.x = pad; mover.vx *= -1; }
-    if(mover.y < pad){ mover.y = pad; mover.vy *= -1; }
-    if(mover.x > maxX){ mover.x = maxX; mover.vx *= -1; }
-    if(mover.y > maxY){ mover.y = maxY; mover.vy *= -1; }
+    // bounce center inside viewport
+    if(cx < pad){ cx = pad; dcx *= -1; }
+    if(cy < pad){ cy = pad; dcy *= -1; }
+    if(cx > window.innerWidth - pad){ cx = window.innerWidth - pad; dcx *= -1; }
+    if(cy > window.innerHeight - pad){ cy = window.innerHeight - pad; dcy *= -1; }
 
-    // slight random jitter
-    if(Math.random() < 0.03){
-      mover.vx += rand(-0.6, 0.6);
-      mover.vy += rand(-0.6, 0.6);
-      // clamp speed
-      mover.vx = Math.max(-6, Math.min(6, mover.vx));
-      mover.vy = Math.max(-6, Math.min(6, mover.vy));
+    // orbit around drifting center
+    t += 1;
+    const r = radius * (1 + Math.sin(t * wobble) * 0.25);
+    const x = cx + Math.cos(t * omega) * r;
+    const y = cy + Math.sin(t * omega) * r * 0.72;
+
+    // clamp final position so meme never goes off-screen
+    const fx = Math.max(pad, Math.min(maxX, x));
+    const fy = Math.max(pad, Math.min(maxY, y));
+
+    imgEl.style.transform = `translate(${fx}px, ${fy}px)`;
+
+    // occasional randomize to look "random lượn"
+    if(Math.random() < 0.01){
+      radius = rand(60, 180);
+      omega = rand(0.016, 0.05);
+      wobble = rand(0.10, 0.40);
+      dcx += rand(-0.3, 0.3);
+      dcy += rand(-0.3, 0.3);
+      dcx = Math.max(-2.2, Math.min(2.2, dcx));
+      dcy = Math.max(-2.2, Math.min(2.2, dcy));
     }
-
-    imgEl.style.transform = `translate(${mover.x}px, ${mover.y}px)`;
 
     rafMeme = requestAnimationFrame(step);
   }
@@ -183,6 +201,7 @@ function reset(){
   locked = false;
 
   envs.forEach(e=>{
+    e.style.display = "";
     e.classList.remove("open","vanish");
     e.disabled = false;
     // reset meme image styles (in case moved)
@@ -234,11 +253,17 @@ envs.forEach(chosen=>{
 
     // sau khi meme pop ra, bắt đầu chạy loạn
     setTimeout(() => {
-      const img = chosen.querySelector(".memeIn img");
-      startMemeMove(img);
-    }, 900);
-  });
-});
+  const img = chosen.querySelector(".memeIn img");
+
+  // đưa meme ra khỏi envelope trước khi ẩn envelope
+  startMemeMove(img);
+
+  // ẩn envelope đã chọn (sau 1 nhịp nhỏ để không giật)
+  setTimeout(() => {
+    chosen.style.display = "none";
+  }, 120);
+
+}, 900);
 
 again.addEventListener("click", reset);
 

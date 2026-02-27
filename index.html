@@ -3,45 +3,39 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Lì xì QR 😼</title>
+  <title>Mở lì xì</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="bg">
+  <canvas id="fw" class="fw" aria-hidden="true"></canvas>
+
   <main class="wrap">
     <section class="card">
-      <div class="seal">🧧</div>
-      <h1>Lì xì online</h1>
-      <p class="sub">Bấm để mở. Nhạc + meme sẽ xuất hiện 😈</p>
+      <h1 class="title">Bạn nhận được lì xì 😈</h1>
+      <p class="sub">Bấm mở để bật pháo hoa + nhạc + meme.</p>
 
       <button id="openBtn" class="btn">MỞ LÌ XÌ</button>
 
-      <div id="reveal" class="reveal hidden" aria-hidden="true">
+      <div id="reveal" class="reveal hidden">
         <div class="memeBox">
           <img src="assets/meme.gif" alt="meme" />
         </div>
 
         <div class="audioBox">
-          <div class="now">🎵 Đang phát</div>
+          <div class="now">🎵 Nhạc</div>
           <audio id="audio" controls preload="auto">
             <source src="assets/song.mp3" type="audio/mpeg" />
-            Trình duyệt không hỗ trợ audio.
           </audio>
-          <p class="hint">Nếu không nghe được, bấm nút Play trong thanh audio.</p>
+          <p class="tiny">Nếu không tự phát, bấm Play trong thanh audio.</p>
         </div>
 
-        <div class="actions">
-          <button id="againBtn" class="btn ghost">MỞ LẠI</button>
+        <div class="row">
           <a class="btn ghost" href="qr.html">Xem QR để share</a>
         </div>
       </div>
     </section>
-
-    <footer class="foot">
-      <span>Made for fun.</span>
-    </footer>
   </main>
 
-  <canvas id="fx" class="fx" aria-hidden="true"></canvas>
   <script src="app.js"></script>
 </body>
 </html>

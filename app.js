@@ -257,7 +257,7 @@ envs.forEach(chosen=>{
 
   // đưa meme ra khỏi envelope trước khi ẩn envelope
   startMemeMove(img);
-
+  img.classList.add("memeFlying");
   // ẩn envelope đã chọn (sau 1 nhịp nhỏ để không giật)
   setTimeout(() => {
     chosen.style.display = "none";

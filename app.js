@@ -1,13 +1,14 @@
-const openBtn = document.getElementById("openBtn");
-const reveal = document.getElementById("reveal");
+const grid = document.getElementById("grid");
+const envButtons = [...document.querySelectorAll(".env")];
+const result = document.getElementById("result");
 const audio = document.getElementById("audio");
+const again = document.getElementById("again");
 
-const canvas = document.getElementById("fw");
+const canvas = document.getElementById("fx");
 const ctx = canvas.getContext("2d");
-
 let W, H, dpr;
 let particles = [];
-let running = false;
+let raf = null;
 
 function resize(){
   dpr = window.devicePixelRatio || 1;
@@ -17,85 +18,123 @@ function resize(){
 window.addEventListener("resize", resize);
 resize();
 
+// Add flap element into each envelope (pure JS so HTML stays clean)
+envButtons.forEach(b => {
+  const flap = document.createElement("div");
+  flap.className = "flap";
+  b.appendChild(flap);
+});
+
 function rand(a,b){ return a + Math.random()*(b-a); }
 
-function spawnFirework(x,y){
-  const count = 140;
-  for(let i=0;i<count;i++){
+function spawnBurst(x,y){
+  const n = 160;
+  for(let i=0;i<n;i++){
     const ang = rand(0, Math.PI*2);
-    const sp = rand(2.5, 7.5) * dpr;
+    const sp = rand(2.2, 7.6) * dpr;
     particles.push({
       x, y,
       vx: Math.cos(ang)*sp,
       vy: Math.sin(ang)*sp,
-      g: 0.06*dpr,
-      life: rand(45, 85),
-      maxLife: 0,
-      size: rand(1.2, 2.6)*dpr
+      g: 0.07*dpr,
+      life: rand(40, 85),
+      size: rand(1.2, 2.6)*dpr,
+      a: 1
     });
   }
 }
 
 function tick(){
-  if(!running) return;
-  ctx.clearRect(0,0,W,H);
-
-  // fade nhẹ để tạo vệt
-  ctx.fillStyle = "rgba(246,239,228,0.18)";
+  ctx.fillStyle = "rgba(0,0,0,0.18)";
   ctx.fillRect(0,0,W,H);
 
-  // update particles
   for(const p of particles){
     p.vy += p.g;
     p.x += p.vx;
     p.y += p.vy;
     p.life -= 1;
+    p.a *= 0.985;
 
     ctx.beginPath();
     ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-    ctx.fillStyle = "rgba(0,0,0,0.95)";
+    ctx.fillStyle = `rgba(247,201,91,${Math.max(0,p.a)})`;
     ctx.fill();
   }
+  particles = particles.filter(p => p.life>0 && p.a>0.05 && p.y < H+80);
 
-  particles = particles.filter(p => p.life > 0 && p.x>-50 && p.x<W+50 && p.y>-50 && p.y<H+50);
-
-  requestAnimationFrame(tick);
-}
-
-async function openLixi(){
-  // hiện meme + audio
-  reveal.classList.remove("hidden");
-
-  // bắt đầu fireworks loop
-  running = true;
-  ctx.clearRect(0,0,W,H);
-  tick();
-
-  // bắn vài phát đầu
-  const cx = W*0.5, cy = H*0.32;
-  spawnFirework(cx, cy);
-  setTimeout(() => spawnFirework(cx*0.7, cy*0.9), 200);
-  setTimeout(() => spawnFirework(cx*1.25, cy*1.05), 380);
-
-  // bắn liên tục 1 thời gian
-  let t = 0;
-  const timer = setInterval(() => {
-    t += 1;
-    spawnFirework(rand(W*0.2, W*0.8), rand(H*0.15, H*0.55));
-    if(t >= 14){
-      clearInterval(timer);
-      // vẫn để loop chạy thêm chút rồi tự dừng
-      setTimeout(() => { running = false; ctx.clearRect(0,0,W,H); }, 1800);
-    }
-  }, 260);
-
-  // play nhạc (sẽ OK vì là user click)
-  try{
-    audio.currentTime = 0;
-    await audio.play();
-  }catch(e){
-    // nếu bị chặn, user bấm play
+  if(particles.length > 0){
+    raf = requestAnimationFrame(tick);
+  } else {
+    ctx.clearRect(0,0,W,H);
+    raf = null;
   }
 }
 
-openBtn.addEventListener("click", openLixi);
+function fireworksAtElement(el){
+  const r = el.getBoundingClientRect();
+  const x = (r.left + r.width/2) * dpr;
+  const y = (r.top + r.height*0.15) * dpr;
+  spawnBurst(x,y);
+  if(!raf) tick();
+
+  // thêm vài phát
+  setTimeout(() => { spawnBurst(rand(W*0.2,W*0.8), rand(H*0.12,H*0.45)); if(!raf) tick(); }, 220);
+  setTimeout(() => { spawnBurst(rand(W*0.2,W*0.8), rand(H*0.12,H*0.45)); if(!raf) tick(); }, 420);
+}
+
+let locked = false;
+
+async function playSound(){
+  try{
+    audio.currentTime = 0;
+    await audio.play(); // cố autoplay sau click (thường OK)
+  }catch(e){
+    // bị chặn thì user bấm Play trong controls
+  }
+}
+
+function disableOthers(chosen){
+  envButtons.forEach(b => {
+    if(b !== chosen) b.classList.add("disabled");
+    b.disabled = true;
+  });
+}
+
+function resetAll(){
+  locked = false;
+  result.classList.add("hidden");
+  envButtons.forEach(b => {
+    b.classList.remove("open", "disabled");
+    b.disabled = false;
+  });
+  // stop sound
+  audio.pause();
+  audio.currentTime = 0;
+
+  // clear fireworks
+  particles = [];
+  if(raf) cancelAnimationFrame(raf);
+  raf = null;
+  ctx.clearRect(0,0,W,H);
+}
+
+envButtons.forEach(btn => {
+  btn.addEventListener("click", async () => {
+    if(locked) return;
+    locked = true;
+
+    btn.classList.add("open");
+    disableOthers(btn);
+
+    // chờ flap mở rồi show meme
+    setTimeout(() => {
+      result.classList.remove("hidden");
+      fireworksAtElement(btn);
+    }, 450);
+
+    // bật nhạc sau click (ổn nhất)
+    await playSound();
+  });
+});
+
+again.addEventListener("click", resetAll);

@@ -137,34 +137,8 @@
   }
 
   function reset(){
-    locked = false;
-
-    envs.forEach(e=>{
-      e.style.display="";
-      e.classList.remove("open","vanish");
-      e.disabled=false;
-
-      const wrap = e.querySelector(".memeIn .memeWrap");
-      const img = e.querySelector(".memeIn img");
-      if(wrap){
-        wrap.style.position=""; wrap.style.left=""; wrap.style.top="";
-        wrap.style.zIndex=""; wrap.style.pointerEvents="";
-        wrap.style.width=""; wrap.style.transform="";
-      }
-      if(img) img.classList.remove("memeBlink");
-    });
-
-    audio.pause();
-    audio.currentTime = 0;
-
-    particles = [];
-    if(rafFx){ cancelAnimationFrame(rafFx); rafFx=null; }
-    if(rafMeme){ cancelAnimationFrame(rafMeme); rafMeme=null; }
-    ctx.clearRect(0,0,W,H);
-// remove any flying meme containers
-document.querySelectorAll(".memeFly").forEach(el => el.remove());
-    
-  }
+  location.reload();
+}
 
   envs.forEach(chosen=>{
     chosen.addEventListener("click", async ()=>{
@@ -181,31 +155,32 @@ document.querySelectorAll(".memeFly").forEach(el => el.remove());
       await tryPlay();
 
       setTimeout(() => {
+
   const img = chosen.querySelector(".memeIn img");
   if (!img) return;
 
-  // 1) Tạo container bay độc lập (tách khỏi envelope)
+  // --- tạo container bay độc lập ---
   const fly = document.createElement("div");
-  fly.className = "memeFly";          // chỉ để debug, không bắt buộc
+  fly.className = "memeFly";
+  fly.style.position = "fixed";
+  fly.style.left = "0px";
+  fly.style.top = "0px";
+  fly.style.zIndex = "9999";
+  fly.style.pointerEvents = "none";
+
   document.body.appendChild(fly);
 
-  // 2) Move IMG từ envelope sang body
+  // --- đưa ảnh ra khỏi phong bao ---
   fly.appendChild(img);
 
-  // 3) Cho img blink
+  // --- cho blink ---
   img.classList.add("memeBlink");
 
-  // 4) Bắt đầu bay lượn vòng trên fly (wrapper nằm ở body)
+  // --- bắt đầu bay ---
   startMemeMove(fly);
-
-  // 5) Xóa phần memeIn trống (optional)
-  const memeIn = chosen.querySelector(".memeIn");
-  if (memeIn) memeIn.innerHTML = "";
-
-  // 6) Giờ mới ẩn envelope đã chọn (meme vẫn bay vì nó đã tách ra body)
-  setTimeout(() => {
-    chosen.style.display = "none";
-  }, 120);
+console.log("MOVE START");
+  // --- xóa phong bao khỏi DOM luôn (không display none nữa) ---
+  chosen.remove();
 
 }, 900);
 

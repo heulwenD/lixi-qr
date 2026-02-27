@@ -1,14 +1,14 @@
-const grid = document.getElementById("grid");
-const envButtons = [...document.querySelectorAll(".env")];
-const result = document.getElementById("result");
-const audio = document.getElementById("audio");
+const envs = [...document.querySelectorAll(".env")];
 const again = document.getElementById("again");
+const audio = document.getElementById("audio");
 
 const canvas = document.getElementById("fx");
 const ctx = canvas.getContext("2d");
+
 let W, H, dpr;
 let particles = [];
 let raf = null;
+let locked = false;
 
 function resize(){
   dpr = window.devicePixelRatio || 1;
@@ -18,123 +18,137 @@ function resize(){
 window.addEventListener("resize", resize);
 resize();
 
-// Add flap element into each envelope (pure JS so HTML stays clean)
-envButtons.forEach(b => {
-  const flap = document.createElement("div");
-  flap.className = "flap";
-  b.appendChild(flap);
-});
-
 function rand(a,b){ return a + Math.random()*(b-a); }
 
-function spawnBurst(x,y){
-  const n = 160;
+function color(){
+  const palette = [
+    [255, 80, 80],
+    [255, 210, 90],
+    [90, 220, 255],
+    [170, 120, 255],
+    [120, 255, 170],
+    [255, 140, 220]
+  ];
+  return palette[Math.floor(Math.random()*palette.length)];
+}
+
+function spawnRibbonBurst(x,y){
+  const n = 220;
   for(let i=0;i<n;i++){
     const ang = rand(0, Math.PI*2);
-    const sp = rand(2.2, 7.6) * dpr;
+    const sp = rand(2.2, 8.8) * dpr;
+    const [r,g,b] = color();
     particles.push({
-      x, y,
+      x,y,
       vx: Math.cos(ang)*sp,
       vy: Math.sin(ang)*sp,
-      g: 0.07*dpr,
-      life: rand(40, 85),
-      size: rand(1.2, 2.6)*dpr,
-      a: 1
+      g: 0.06*dpr,
+      life: rand(55, 105),
+      w: rand(2.0, 4.5)*dpr,     // ribbon width
+      h: rand(6.0, 14.0)*dpr,    // ribbon length
+      rot: rand(0, Math.PI),
+      vr: rand(-0.2, 0.2),
+      a: 1,
+      r,g,b
     });
   }
 }
 
 function tick(){
-  ctx.fillStyle = "rgba(0,0,0,0.18)";
+  // fade to create trails
+  ctx.fillStyle = "rgba(0,0,0,0.20)";
   ctx.fillRect(0,0,W,H);
 
   for(const p of particles){
     p.vy += p.g;
     p.x += p.vx;
     p.y += p.vy;
+    p.rot += p.vr;
     p.life -= 1;
-    p.a *= 0.985;
+    p.a *= 0.986;
 
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-    ctx.fillStyle = `rgba(247,201,91,${Math.max(0,p.a)})`;
-    ctx.fill();
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rot);
+    ctx.globalAlpha = Math.max(0, p.a);
+    ctx.fillStyle = `rgb(${p.r},${p.g},${p.b})`;
+    ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+    ctx.restore();
   }
-  particles = particles.filter(p => p.life>0 && p.a>0.05 && p.y < H+80);
 
-  if(particles.length > 0){
+  particles = particles.filter(p => p.life>0 && p.a>0.06 && p.y < H+120);
+
+  if(particles.length){
     raf = requestAnimationFrame(tick);
-  } else {
-    ctx.clearRect(0,0,W,H);
+  }else{
     raf = null;
+    ctx.clearRect(0,0,W,H);
   }
 }
 
-function fireworksAtElement(el){
+function fireworksAt(el){
   const r = el.getBoundingClientRect();
   const x = (r.left + r.width/2) * dpr;
-  const y = (r.top + r.height*0.15) * dpr;
-  spawnBurst(x,y);
-  if(!raf) tick();
+  const y = (r.top + r.height*0.30) * dpr;
 
-  // thêm vài phát
-  setTimeout(() => { spawnBurst(rand(W*0.2,W*0.8), rand(H*0.12,H*0.45)); if(!raf) tick(); }, 220);
-  setTimeout(() => { spawnBurst(rand(W*0.2,W*0.8), rand(H*0.12,H*0.45)); if(!raf) tick(); }, 420);
+  spawnRibbonBurst(x,y);
+  setTimeout(()=>spawnRibbonBurst(rand(W*0.2,W*0.8), rand(H*0.10,H*0.45)), 180);
+  setTimeout(()=>spawnRibbonBurst(rand(W*0.2,W*0.8), rand(H*0.10,H*0.45)), 360);
+  setTimeout(()=>spawnRibbonBurst(rand(W*0.2,W*0.8), rand(H*0.10,H*0.45)), 540);
+
+  if(!raf) tick();
 }
 
-let locked = false;
-
-async function playSound(){
+async function tryPlay(){
   try{
     audio.currentTime = 0;
-    await audio.play(); // cố autoplay sau click (thường OK)
+    await audio.play(); // click envelope = user gesture => thường OK
   }catch(e){
-    // bị chặn thì user bấm Play trong controls
+    // iOS đôi khi vẫn chặn -> user click again button or tap anywhere
   }
 }
 
-function disableOthers(chosen){
-  envButtons.forEach(b => {
-    if(b !== chosen) b.classList.add("disabled");
-    b.disabled = true;
-  });
-}
-
-function resetAll(){
+function reset(){
   locked = false;
-  result.classList.add("hidden");
-  envButtons.forEach(b => {
-    b.classList.remove("open", "disabled");
-    b.disabled = false;
+  envs.forEach(e=>{
+    e.classList.remove("open","vanish");
+    e.disabled = false;
   });
-  // stop sound
   audio.pause();
   audio.currentTime = 0;
 
-  // clear fireworks
   particles = [];
   if(raf) cancelAnimationFrame(raf);
   raf = null;
   ctx.clearRect(0,0,W,H);
 }
 
-envButtons.forEach(btn => {
-  btn.addEventListener("click", async () => {
+envs.forEach(chosen=>{
+  chosen.addEventListener("click", async ()=>{
     if(locked) return;
     locked = true;
 
-    btn.classList.add("open");
-    disableOthers(btn);
+    // 5 cái còn lại biến mất đồng thời
+    envs.forEach(e=>{
+      if(e !== chosen) e.classList.add("vanish");
+      e.disabled = true;
+    });
 
-    // chờ flap mở rồi show meme
-    setTimeout(() => {
-      result.classList.remove("hidden");
-      fireworksAtElement(btn);
-    }, 450);
+    // mở phong bao + meme chui ra (CSS animation)
+    chosen.classList.add("open");
 
-    // bật nhạc sau click (ổn nhất)
-    await playSound();
+    // pháo hoa nhiều màu
+    fireworksAt(chosen);
+
+    // nhạc tự bật (không hiện player)
+    await tryPlay();
   });
 });
 
-again.addEventListener("click", resetAll);
+again.addEventListener("click", reset);
+
+// fallback: nếu autoplay bị chặn, user chạm màn hình để bật
+document.addEventListener("pointerdown", ()=>{
+  if(!locked) return;
+  if(audio.paused) audio.play().catch(()=>{});
+}, {passive:true});
